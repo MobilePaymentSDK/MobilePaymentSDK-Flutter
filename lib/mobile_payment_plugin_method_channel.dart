@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -86,11 +87,20 @@ class MobilePaymentSdk extends PaymentPlatform {
           'openPaymentPage',
           openPayment.toIOSJson(_initializeSDK),
         );
-        String status = resp["code"].toString();
-        if (status.toLowerCase() == '200') {
-          onPaymentResponse(Response.fromIOSJsonSuccess(resp));
+        log(resp.toString(), name: 'resp');
+
+        Map<Object?, Object?> newResp;
+        if (resp['response'].toString() == 'null') {
+          newResp = resp;
         } else {
-          onPaymentFailed(PaymentFailed.fromIOSJson(resp));
+          newResp = resp["response"] as Map<Object?, Object?>;
+        }
+        String status = (newResp["Response.StatusCode"]).toString();
+        log(newResp.toString(), name: 'newResp');
+        if (status == '00000') {
+          onPaymentResponse(Response.fromIOSJsonSuccess(newResp));
+        } else {
+          onPaymentFailed(PaymentFailed.fromIOSJson(newResp));
         }
       } else {
         throw const Errors(
@@ -239,6 +249,7 @@ class MobilePaymentSdk extends PaymentPlatform {
         );
 
         String status = resp["code"].toString();
+        log(resp.toString(), name: 'res[');
         if (status.toLowerCase() == '200') {
           onPaymentResponse(Response.fromIOSJsonSuccess(resp));
         } else {

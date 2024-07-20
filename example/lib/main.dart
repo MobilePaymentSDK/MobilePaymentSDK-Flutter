@@ -44,20 +44,20 @@ class ExampleMobilePaymentSDK extends StatelessWidget {
           ),
           outlinedButtonTheme: OutlinedButtonThemeData(
             style: ButtonStyle(
-              textStyle: MaterialStateProperty.all(
+              textStyle: WidgetStateProperty.all(
                 const TextStyle(
                   fontWeight: FontWeight.w600,
                 ),
               ),
               foregroundColor:
-                  MaterialStateProperty.all(const Color(0xff007A8A)),
-              shape: MaterialStateProperty.all(
+                  WidgetStateProperty.all(const Color(0xff007A8A)),
+              shape: WidgetStateProperty.all(
                 RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
               ),
-              overlayColor: MaterialStateProperty.all(const Color(0xff007A8A)),
-              side: MaterialStateProperty.all(
+              overlayColor: WidgetStateProperty.all(const Color(0xff007A8A)),
+              side: WidgetStateProperty.all(
                 const BorderSide(
                   width: 2,
                   color: Color(0xff00A4B4),
@@ -68,15 +68,15 @@ class ExampleMobilePaymentSDK extends StatelessWidget {
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ButtonStyle(
               backgroundColor:
-                  MaterialStateProperty.all(const Color(0xff007A8A)),
-              foregroundColor: MaterialStateProperty.all(Colors.white),
-              shape: MaterialStateProperty.all(
+                  WidgetStateProperty.all(const Color(0xff007A8A)),
+              foregroundColor: WidgetStateProperty.all(Colors.white),
+              shape: WidgetStateProperty.all(
                 RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
               ),
-              overlayColor: MaterialStateProperty.all(const Color(0xff007A8A)),
-              textStyle: MaterialStateProperty.all(
+              overlayColor: WidgetStateProperty.all(const Color(0xff007A8A)),
+              textStyle: WidgetStateProperty.all(
                 const TextStyle(
                   fontWeight: FontWeight.w600,
                 ),

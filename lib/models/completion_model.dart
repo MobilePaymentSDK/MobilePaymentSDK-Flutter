@@ -1,8 +1,8 @@
-import '../mobile_payment_plugin_errors_handler.dart';
 import '../mobile_payment_plugin_platform_interface.dart';
+import 'errors.dart';
 import 'initialize_sdk.dart';
 
-class Completion {
+final class Completion {
   final String originalTransactionID;
   final String transactionID;
   final String currencyISOCode;
@@ -13,10 +13,25 @@ class Completion {
     required this.currencyISOCode,
     required this.amount,
     required this.originalTransactionID,
-  }) : assert(ErrorHandler.originalTransactionID(originalTransactionID) &&
-            ErrorHandler.amount(amount) &&
-            ErrorHandler.transactionId(transactionID) &&
-            ErrorHandler.currency(currencyISOCode));
+  }) {
+    RegExp onlyNumbers = RegExp(r'^\d+$');
+    if (amount.trim().isEmpty) {
+      throw const Errors(
+        code: 2000,
+        message: 'Amount is empty',
+      );
+    } else if (!onlyNumbers.hasMatch(transactionID.trim())) {
+      throw const Errors(
+        code: 2005,
+        message: 'Transaction Id must be integer numbers only',
+      );
+    } else if (currencyISOCode.trim().isEmpty) {
+      throw const Errors(
+        code: 2007,
+        message: 'currency is empty',
+      );
+    }
+  }
 
   Map<String, dynamic> toJson() {
     return {

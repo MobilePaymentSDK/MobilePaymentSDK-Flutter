@@ -5,6 +5,7 @@ class CustomTextField extends StatelessWidget {
   const CustomTextField({
     super.key,
     this.hintText,
+    this.initialValue,
     this.validator,
     this.prefixIcon,
     this.controller,
@@ -24,6 +25,7 @@ class CustomTextField extends StatelessWidget {
   });
 
   final String? hintText;
+  final String? initialValue;
   final FormFieldValidator? validator;
   final Widget? prefixIcon;
   final IconButton? suffixIcon;
@@ -47,6 +49,7 @@ class CustomTextField extends StatelessWidget {
       readOnly: readOnly ?? false,
       inputFormatters: inputFormatters,
       focusNode: focusNode,
+      initialValue: initialValue,
       cursorColor: Theme.of(context).primaryColor,
       enableInteractiveSelection: true,
       autofocus: autofocus ?? false,

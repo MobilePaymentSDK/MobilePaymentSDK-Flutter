@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tap_debouncer/tap_debouncer.dart';
 
 import '../app_provider.dart';
 import '../helper/dialogs.dart';
@@ -37,80 +38,162 @@ class OtherAPIMobilePaymentExample extends StatelessWidget {
                   children: [
                     SizedBox(
                       width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: () async {
-                          await provider.completion(
-                            onError: (code, error) {
+                      child: TapDebouncer(
+                          cooldown: const Duration(seconds: 1),
+                          onTap: () async {
+                            if(provider.amount.text.isEmpty){
                               showCustomDialog(
                                 context,
-                                title: 'Code:$code',
-                                description: error,
+                                title: 'Code: 2000',
+                                description: 'Amount is empty',
                               );
-                            },
-                            onResponse: (result) async {
-                              await showDialog(
-                                context: context,
-                                useSafeArea: true,
-                                builder: (context) {
-                                  return ResponseDialog(result: result);
+                            }else if(provider.currency.text.isEmpty){
+                              showCustomDialog(
+                                context,
+                                title: 'Code: 2007',
+                                description: 'currency is empty',
+                              );
+                            }else if(provider.transactionId.isEmpty){
+                              showCustomDialog(
+                                context,
+                                title: 'Code: 2000',
+                                description: 'transactionId is empty',
+                              );
+                            }else if(provider.originalTransactionID.isEmpty){
+                              showCustomDialog(
+                                context,
+                                title: 'Code: 2000',
+                                description: 'original TransactionID is empty',
+                              );
+                            }else{
+                              await provider.completion(
+                                onError: (code, error) {
+                                  showCustomDialog(
+                                    context,
+                                    title: 'Code:$code',
+                                    description: error,
+                                  );
+                                },
+                                onResponse: (result) async {
+                                  await showDialog(
+                                    context: context,
+                                    useSafeArea: true,
+                                    builder: (context) {
+                                      return ResponseDialog(result: result);
+                                    },
+                                  );
                                 },
                               );
-                            },
+                            }
+
+                          }, // your tap handler moved here
+                          builder: (BuildContext context, TapDebouncerFunc? onTap) {
+                          return OutlinedButton(
+                            onPressed: onTap,
+                            child: const Text('Completion'),
                           );
-                        },
-                        child: const Text('Completion'),
+                        }
                       ),
                     ),
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          await provider.refund(
-                            onError: (code, error) {
+                      child: TapDebouncer(
+                          cooldown: const Duration(seconds: 1),
+                          onTap: () async {
+
+                            if(provider.amount.text.isEmpty){
                               showCustomDialog(
                                 context,
-                                title: 'Code:$code',
-                                description: error,
+                                title: 'Code: 2000',
+                                description: 'Amount is empty',
                               );
-                            },
-                            onResponse: (result) async {
-                              await showDialog(
-                                context: context,
-                                useSafeArea: true,
-                                builder: (context) {
-                                  return ResponseDialog(result: result);
+                            }else if(provider.currency.text.isEmpty){
+                              showCustomDialog(
+                                context,
+                                title: 'Code: 2007',
+                                description: 'currency is empty',
+                              );
+                            }else if(provider.transactionId.isEmpty){
+                              showCustomDialog(
+                                context,
+                                title: 'Code: 2000',
+                                description: 'transactionId is empty',
+                              );
+                            }else if(provider.originalTransactionID.isEmpty){
+                              showCustomDialog(
+                                context,
+                                title: 'Code: 2000',
+                                description: 'original TransactionID is empty',
+                              );
+                            }else{
+                              await provider.refund(
+                                onError: (code, error) {
+                                  showCustomDialog(
+                                    context,
+                                    title: 'Code:$code',
+                                    description: error,
+                                  );
+                                },
+                                onResponse: (result) async {
+                                  await showDialog(
+                                    context: context,
+                                    useSafeArea: true,
+                                    builder: (context) {
+                                      return ResponseDialog(result: result);
+                                    },
+                                  );
                                 },
                               );
-                            },
+                            }
+
+                          }, // your tap handler moved here
+                          builder: (BuildContext context, TapDebouncerFunc? onTap) {
+                          return ElevatedButton(
+                            onPressed: onTap,
+                            child: const Text('Refund'),
                           );
-                        },
-                        child: const Text('Refund'),
+                        }
                       ),
                     ),
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          await provider.inquiry(
-                            onError: (code, error) {
+                      child: TapDebouncer(
+                          cooldown: const Duration(seconds: 1),
+                          onTap: () async {
+                            if(provider.originalTransactionID.isEmpty){
                               showCustomDialog(
                                 context,
-                                title: 'Code:$code',
-                                description: error,
+                                title: 'Code: 2000',
+                                description: 'original TransactionID is empty',
                               );
-                            },
-                            onResponse: (result) async {
-                              await showDialog(
-                                context: context,
-                                useSafeArea: true,
-                                builder: (context) {
-                                  return ResponseDialog(result: result);
+                            }else{
+                              await provider.inquiry(
+                                onError: (code, error) {
+                                  showCustomDialog(
+                                    context,
+                                    title: 'Code:$code',
+                                    description: error,
+                                  );
+                                },
+                                onResponse: (result) async {
+                                  await showDialog(
+                                    context: context,
+                                    useSafeArea: true,
+                                    builder: (context) {
+                                      return ResponseDialog(result: result);
+                                    },
+                                  );
                                 },
                               );
-                            },
+                            }
+
+                          }, // your tap handler moved here
+                          builder: (BuildContext context, TapDebouncerFunc? onTap) {
+                          return ElevatedButton(
+                            onPressed: onTap,
+                            child: const Text('Inquiry'),
                           );
-                        },
-                        child: const Text('Inquiry'),
+                        }
                       ),
                     ),
                   ],

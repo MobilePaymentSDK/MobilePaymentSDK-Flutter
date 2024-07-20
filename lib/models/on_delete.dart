@@ -1,4 +1,4 @@
-class OnDeleteCard {
+final class OnDeleteCard {
   final String token;
   final bool deleted;
 

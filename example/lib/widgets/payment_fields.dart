@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_payment_plugin/models/open_payment.dart';
+import 'package:mobile_payment_plugin_example/screens/saved_cards.dart';
 import 'package:provider/provider.dart';
 
 import '../app_provider.dart';
@@ -20,51 +21,66 @@ class PaymentFields extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const NoteText(text: 'Merchant ID'),
             CustomTextField(
-              onChanged: (value) => provider.onChangeAmount(value),
+              onChanged: (value) => provider.onChangeMerchantId(value),
               keyboardType:
-                  const TextInputType.numberWithOptions(decimal: false),
+              TextInputType.text,
+              initialValue: '',
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
               ],
-              hintText: 'Amount',
+              hintText: '',
               textInputAction: TextInputAction.next,
             ),
-            const NoteText(text: '* Amount without dot'),
+
+            const NoteText(text: 'Secret Key'),
             CustomTextField(
-              onChanged: (value) => provider.onChangeToken(value),
-              keyboardType: TextInputType.multiline,
-              hintText: 'Token',
-              maxLines: null,
-              textInputAction: TextInputAction.next,
-            ),
-            const NoteText(text: 'Tokens separated by comma (,) if multi'),
-            CustomTextField(
-              onChanged: (value) => provider.onChangeCurrency(value),
+              onChanged: (value) => provider.onChangeSecretKey(value),
               keyboardType:
-                  const TextInputType.numberWithOptions(decimal: false),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(
-                  RegExp(r'^\d+\.?\d{0,2}'),
-                ),
-              ],
-              hintText: 'Currency',
-              textInputAction: TextInputAction.next,
-            ),
-            const NoteText(text: 'Currency code (Only one currency)'),
-            CustomTextField(
-              onChanged: (value) => provider.onChangeTransactionId(value),
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: false),
+              TextInputType.text,
+              initialValue: '',
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
               ],
-              hintText: 'Transaction ID',
-              textInputAction: TextInputAction.done,
+              hintText: '',
+              textInputAction: TextInputAction.next,
             ),
-            const NoteText(
-              text: 'Transaction ID (Keep empty for auto generation)',
+
+            const NoteText(text: 'Apple Merchant ID'),
+            CustomTextField(
+              onChanged: (value) => provider.onChangeAppleMerchantId(value),
+              keyboardType:
+              TextInputType.text,
+              initialValue: '',
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+              hintText: '',
+              textInputAction: TextInputAction.next,
             ),
+
+            const SizedBox(height: 18,),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  provider.clearData();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return const SavedCard();
+                      },
+                    ),
+                  );
+                },
+                child: const Text('Saved Cards'),
+              ),
+            ),
+            const SizedBox(height: 18,),
+
+
             SwitchListTile.adaptive(
               value: provider.isThreeDSSecure,
               onChanged: (value) => provider.onChangeThreeDSSecure(value),
@@ -97,16 +113,16 @@ class PaymentFields extends StatelessWidget {
                 ),
               ),
             ),
-            SwitchListTile.adaptive(
-              value: provider.isSaveCardEnable,
-              onChanged: (value) => provider.onChangeSaveCardEnable(value),
-              title: Text(
-                'Is Save Card Enabled',
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-            ),
+            // SwitchListTile.adaptive(
+            //   value: provider.shouldTokenizeCard,
+            //   onChanged: (value) => provider.onChangeShouldTokenizeCard(value),
+            //   title: Text(
+            //     'Is Save Card Enabled',
+            //     style: TextStyle(
+            //       color: Theme.of(context).primaryColor,
+            //     ),
+            //   ),
+            // ),
             CustomDropdownButton(
               selectedTextValue: provider.selectedLangVale,
               onChanged: (value) => provider.onChangeLang(value),
@@ -164,6 +180,80 @@ class PaymentFields extends StatelessWidget {
                 );
               },
             ),
+
+            const SizedBox(height: 18,),
+            const NoteText(text: 'agreement id'),
+            CustomTextField(
+              onChanged: (value) => provider.onChangeAgreementId(value),
+              keyboardType:
+              const TextInputType.numberWithOptions(decimal: false),
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+              hintText: 'agreement id',
+              initialValue: provider.agreementId,
+              textInputAction: TextInputAction.next,
+            ),
+            const NoteText(text: 'item id'),
+            CustomTextField(
+              onChanged: (value) => provider.onChangeItemId(value),
+              keyboardType: TextInputType.text,
+              hintText: 'item id',
+              initialValue: provider.itemId,
+              textInputAction: TextInputAction.next,
+            ),
+            const NoteText(text: 'Quantity '),
+            CustomTextField(
+              onChanged: (value) => provider.onChangeQuantity(value),
+              keyboardType:
+              const TextInputType.numberWithOptions(decimal: false),
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+              hintText: 'Quantity',
+              initialValue: provider.quantity.toString(),
+              textInputAction: TextInputAction.next,
+            ),
+
+            //
+            const NoteText(text: 'Amount without dot'),
+            CustomTextField(
+              onChanged: (value) => provider.onChangeAmount(value),
+              keyboardType:
+              const TextInputType.numberWithOptions(decimal: false),
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+              hintText: 'Amount',
+              controller: provider.amount,
+              textInputAction: TextInputAction.next,
+            ),
+
+            const NoteText(text: 'Currency code (Only one currency)'),
+            CustomTextField(
+              onChanged: (value) => provider.onChangeCurrency(value),
+              keyboardType:
+              const TextInputType.numberWithOptions(decimal: false),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(
+                  RegExp(r'^\d+\.?\d{0,2}'),
+                ),
+              ],
+              hintText: 'Currency',
+              controller: provider.currency,
+              textInputAction: TextInputAction.next,
+            ),
+            const NoteText(
+              text: 'Transaction ID ',
+            ),
+            const CustomTextField(
+              keyboardType:
+               TextInputType.text,
+              //controller: provider.transactionId,
+              hintText: 'Transaction ID',
+              textInputAction: TextInputAction.done,
+            ),
+
           ],
         );
       },

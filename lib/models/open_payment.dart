@@ -1,8 +1,8 @@
-import '../mobile_payment_plugin_errors_handler.dart';
 import '../mobile_payment_plugin_platform_interface.dart';
+import 'errors.dart';
 import 'initialize_sdk.dart';
 
-class OpenPayment {
+final class OpenPayment {
   final String amount;
   final List<String> tokens;
   final String currency;
@@ -10,19 +10,17 @@ class OpenPayment {
   final bool isThreeDSSecure;
   final bool shouldTokenizeCard;
   final bool isCardScanEnable;
-  final bool isSaveCardEnable;
   final Language langCode;
   final PaymentType paymentType;
   final String paymentTitle;
   final String paymentDescription;
-  final String version;
   final String frameworkInfo;
   final String itemId;
   final String quantity;
   final String agreementId;
   final AgreementType agreementType;
   final List<CardType> cardsType;
-  final String clientIPaddress;
+  final String clientIPAddress;
 
   OpenPayment({
     required this.amount,
@@ -32,14 +30,12 @@ class OpenPayment {
     this.isThreeDSSecure = true,
     this.shouldTokenizeCard = true,
     this.isCardScanEnable = true,
-    this.isSaveCardEnable = true,
     this.langCode = Language.en,
     this.paymentType = PaymentType.sale,
     this.paymentDescription = 'Sample Payment',
     this.paymentTitle = 'Sample Payment',
-    this.version = '1.0',
     this.frameworkInfo = 'Android 7.0',
-    this.clientIPaddress = '3.7.21.24',
+    this.clientIPAddress = '3.7.21.24',
     this.itemId = "",
     this.quantity = "1",
     this.agreementId = "",
@@ -48,12 +44,30 @@ class OpenPayment {
       CardType.mastercard,
       CardType.visa,
     ],
-  }) : assert(
-          ErrorHandler.amount(amount) &&
-              ErrorHandler.transactionId(transactionId) &&
-              ErrorHandler.currency(currency) &&
-              ErrorHandler.cardsType(cardsType),
-        );
+  }) {
+    RegExp onlyNumbers = RegExp(r'^\d+$');
+    if (amount.trim().isEmpty) {
+      throw const Errors(
+        code: 2000,
+        message: 'Amount is empty',
+      );
+    } else if (!onlyNumbers.hasMatch(transactionId.trim())) {
+      throw const Errors(
+        code: 2005,
+        message: 'Transaction Id must be integer numbers only',
+      );
+    } else if (currency.trim().isEmpty) {
+      throw const Errors(
+        code: 2007,
+        message: 'currency is empty',
+      );
+    } else if (cardsType.isEmpty) {
+      throw const Errors(
+        code: 2010,
+        message: 'You must choose the card types',
+      );
+    }
+  }
 
   Map<String, dynamic> toJson(InitializeSDK initializeSDK) {
     return {
@@ -68,13 +82,11 @@ class OpenPayment {
       "isThreeDSSecure": isThreeDSSecure,
       "shouldTokenizeCard": shouldTokenizeCard,
       "isCardScanEnable": isCardScanEnable,
-      "isSaveCardEnable": isSaveCardEnable,
       "langCode": langCode.name,
-      "paymentType": paymentType.name,
+      "paymentType": paymentType.index == 0 ? "SALES" : "PREAUTH",
       "paymentDescription": paymentDescription.trim(),
-      "version": version,
       "frameworkInfo": frameworkInfo,
-      "clientIPaddress": clientIPaddress,
+      "clientIPaddress": clientIPAddress,
       "cardsType": cardsType.map<String>((cardType) => cardType.name).toList(),
     };
   }
@@ -92,12 +104,10 @@ class OpenPayment {
       "isThreeDSSecure": isThreeDSSecure,
       "shouldTokenizeCard": shouldTokenizeCard,
       "isCardScanEnable": isCardScanEnable,
-      "isSaveCardEnable": isSaveCardEnable,
       "langCode": langCode.name,
       "paymentType": paymentType.index,
       "paymentTitle": paymentTitle,
       "paymentDescription": paymentDescription.trim(),
-      "version": version,
       "frameworkInfo": frameworkInfo,
       "itemId": itemId,
       "quantity": quantity,

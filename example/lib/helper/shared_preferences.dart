@@ -21,4 +21,29 @@ abstract class SharedPreferencesApp {
     required String key,
   }) async =>
       await sharedPreferences.remove(key);
+
+  static Future<void> updateItem({
+    required String key,
+    required int index,
+    required String newValue,
+  }) async {
+    List<String>? array = sharedPreferences.getStringList(key);
+    if (array != null && index >= 0 && index < array.length) {
+      array[index] = newValue;
+      await sharedPreferences.setStringList(key, array);
+    }
+  }
+
+  static Future<void> deleteItem({
+    required String key,
+    required int index,
+  }) async {
+    List<String>? array = sharedPreferences.getStringList(key);
+    if (array != null && index >= 0 && index < array.length) {
+      array.removeAt(index);
+      await sharedPreferences.setStringList(key, array);
+    }
+  }
 }
+
+

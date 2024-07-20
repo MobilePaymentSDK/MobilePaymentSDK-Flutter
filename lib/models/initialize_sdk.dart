@@ -1,6 +1,6 @@
-import '../mobile_payment_plugin_errors_handler.dart';
+import 'errors.dart';
 
-class InitializeSDK {
+final class InitializeSDK {
   final String merchantId;
   final String secretKey;
   final String appleMerchantId;
@@ -9,10 +9,28 @@ class InitializeSDK {
     required this.merchantId,
     required this.secretKey,
     required this.appleMerchantId,
-  }) : assert(
-          ErrorHandler.merchantID(merchantId) &&
-              ErrorHandler.authenticationToken(secretKey),
+  }) {
+    {
+      if (merchantId.trim().isEmpty) {
+        throw const Errors(
+          code: 2006,
+          message: 'merchantID is empty',
         );
+      }
+      else if (appleMerchantId.trim().isEmpty) {
+        throw const Errors(
+          code: 2003,
+          message: 'Apple MerchantID is empty',
+        );
+      }
+      else if (secretKey.trim().isEmpty) {
+        throw const Errors(
+          code: 2004,
+          message: 'AuthenticationToken is empty',
+        );
+      }
+    }
+  }
 
   Map<String, dynamic> toJson() {
     return {

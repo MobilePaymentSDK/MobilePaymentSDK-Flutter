@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mobile_payment_plugin/models/payment_response.dart';
 
 class ResponseDialog extends StatelessWidget {
@@ -23,17 +24,55 @@ class ResponseDialog extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (result.token != null) ...{
+            Row(
+              children: [
+                _buildText(context,
+                    title: 'TransactionID', data: result.transactionID.toString()),
+                IconButton(
+                  icon: const Icon(Icons.content_copy),
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: result.transactionID.toString()));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Copied to clipboard'),
+                      ),
+                    );
+                  },
+                )
+              ],
+            ),
+            if(result.originalTransactionID.toString().trim() != 'null')
+            Row(
+              children: [
+                _buildText(context,
+                    title: 'OriginalTransactionID', data: result.originalTransactionID.toString()),
+                IconButton(
+                  icon: const Icon(Icons.content_copy),
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: result.originalTransactionID.toString()));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Copied to clipboard'),
+                      ),
+                    );
+                  },
+                )
+              ],
+            ),
             _buildText(context,
                 title: 'StatusCode', data: result.statusCode.toString()),
             _buildText(context,
                 title: 'MessageID', data: result.messageID.toString()),
+            if(result.description !=null)
+              _buildText(context,
+                  title: 'description', data: result.description.toString()),
             _buildText(context,
-                title: 'SaveCard', data: result.saveCard.toString()),
+                title: 'SaveCard', data: result.shouldStoreCard.toString()),
             _buildText(context, title: 'rrn', data: result.rrn.toString()),
             _buildText(context,
                 title: 'ApprovalCode', data: result.approvalCode.toString()),
             _buildText(context,
-                title: 'ApprovalCode',
+                title: 'gatewayStatusCode',
                 data: result.gatewayStatusCode.toString()),
             _buildText(context, title: 'Token', data: result.token.toString()),
             _buildText(context,
@@ -46,8 +85,6 @@ class ResponseDialog extends StatelessWidget {
             _buildText(context,
                 title: 'Amount', data: result.amount.toString()),
             _buildText(context,
-                title: 'TransactionID', data: result.transactionID.toString()),
-            _buildText(context,
                 title: 'CardNumber', data: result.cardNumber.toString()),
             _buildText(context,
                 title: 'GatewayName', data: result.gatewayName.toString()),
@@ -59,6 +96,42 @@ class ResponseDialog extends StatelessWidget {
                 data: result.responseHashMatch.toString()),
           }
           else ...{
+            Row(
+              children: [
+                _buildText(context,
+                    title: 'TransactionID', data: result.transactionID.toString()),
+                IconButton(
+                  icon: const Icon(Icons.content_copy),
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: result.transactionID.toString()));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Copied to clipboard'),
+                      ),
+                    );
+                  },
+                )
+              ],
+            ),
+            if(result.originalTransactionID.toString().trim() != 'null')
+              Row(
+                children: [
+                  _buildText(context,
+                      title: 'OriginalTransactionID', data: result.originalTransactionID.toString()),
+                  IconButton(
+                    icon: const Icon(Icons.content_copy),
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: result.originalTransactionID.toString()));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Copied to clipboard'),
+                        ),
+                      );
+                    },
+                  )
+                ],
+              ),
             _buildText(context,
                 title: 'secureHash', data: result.secureHash.toString()),
             _buildText(context,
@@ -68,8 +141,9 @@ class ResponseDialog extends StatelessWidget {
                 data: result.amount?.toString() ?? ''),
             _buildText(context,
                 title: 'messageID', data: result.messageID.toString()),
-            _buildText(context,
-                title: 'transactionID', data: result.transactionID.toString()),
+            if(result.description !=null)
+              _buildText(context,
+                  title: 'description', data: result.description.toString()),
             _buildText(context,
                 title: 'statusCode',
                 data: result.statusCode.toString()),
@@ -89,7 +163,7 @@ class ResponseDialog extends StatelessWidget {
           },
           style: ButtonStyle(
             foregroundColor:
-                MaterialStateProperty.all(Theme.of(context).primaryColor),
+                WidgetStateProperty.all(Theme.of(context).primaryColor),
           ),
           child: const Text('Ok'),
         ),

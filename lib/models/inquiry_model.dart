@@ -1,12 +1,25 @@
-import '../mobile_payment_plugin_errors_handler.dart';
+import 'errors.dart';
 import 'initialize_sdk.dart';
 
-class Inquiry {
+final class Inquiry {
   final String originalTransactionID;
 
   Inquiry({
     required this.originalTransactionID,
-  }) : assert(ErrorHandler.originalTransactionID(originalTransactionID));
+  }) {
+    RegExp onlyNumbers = RegExp(r'^\d+$');
+    if (originalTransactionID.trim().isEmpty) {
+      throw const Errors(
+        code: 2000,
+        message: 'original transactionId is empty',
+      );
+    } else if (!onlyNumbers.hasMatch(originalTransactionID.trim())) {
+      throw const Errors(
+        code: 2005,
+        message: 'Transaction Id must be integer numbers only',
+      );
+    }
+  }
 
   Map<String, dynamic> toJson() {
     return {

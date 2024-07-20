@@ -18,42 +18,37 @@ class OtherApiFields extends StatelessWidget {
           children: [
             CustomTextField(
               onChanged: (value) => provider.onChangeOriginalTransactionID(value),
-              keyboardType: const TextInputType.numberWithOptions(decimal: false),
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-              ],
               hintText: 'Original TransactionID',
               textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.text,
             ),
             const SizedBox(height: 20),
-            CustomTextField(
-              onChanged: (value) => provider.onChangeTransactionIdOtherApi(value),
-              keyboardType:
-              const TextInputType.numberWithOptions(decimal: false),
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-              ],
+            const CustomTextField(
+              keyboardType:  TextInputType.text,
+              //controller: provider.transactionId,
               hintText: 'Transaction ID',
               textInputAction: TextInputAction.next,
             ),
             const SizedBox(height: 20),
             CustomTextField(
-              onChanged: (value) => provider.onChangeAmountOtherAPI(value),
+              onChanged: (value) => provider.onChangeAmount(value),
               keyboardType: const TextInputType.numberWithOptions(decimal: false),
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
               ],
               hintText: 'Amount',
+              controller: provider.amount,
               textInputAction: TextInputAction.next,
             ),
             const NoteText(text: '* Amount without dot'),
             CustomTextField(
-              onChanged: (value) => provider.onChangeCurrencyOtherAPI(value),
+              onChanged: (value) => provider.onChangeCurrency(value),
               keyboardType: const TextInputType.numberWithOptions(decimal: false),
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
               ],
               hintText: 'Currency',
+              controller: provider.currency,
               textInputAction: TextInputAction.done,
             ),
             const NoteText(text: 'Currency code (Only one currency)'),

@@ -38,7 +38,6 @@ open class MobilePaymentPluginSdkMethods(
     fun paymentMethod(params: Map<String, Any>) {
         val request = OpenPaymentRequest()
         request.paymentType = params["paymentType"] as String
-        //PaymentType.PREAUTH.name
         request.add("AuthenticationToken", params["authenticationToken"] as String)
         request.add("TransactionID", params["transactionId"] as String)
         request.add("MerchantID", params["merchantID"] as String)
@@ -52,7 +51,6 @@ open class MobilePaymentPluginSdkMethods(
         request.add("ThreeDSEnable", params["isThreeDSSecure"] as Boolean)
         request.add("TokenizeCard", params["shouldTokenizeCard"] as Boolean)
         request.add("CardScanningEnable", params["isCardScanEnable"] as Boolean)
-        request.add("SaveCard", params["isSaveCardEnable"] as Boolean)
         request.add("PaymentMethod", arrayListOf<String>(PaymentMethod.Cards.name))
         request.add(
             "CardType",
@@ -61,7 +59,6 @@ open class MobilePaymentPluginSdkMethods(
         //optional param
         //request.addOptional("ItemID", params["itemId"] as String)
         //request.addOptional("Quantity", params["quantity"] as String)
-        request.addOptional("Version", params["version"] as String)
         request.addOptional("FrameworkInfo", params["frameworkInfo"] as String)
         val tokenList = params["tokens"] as List<String>
         request.add("Tokens", tokenList.joinToString(","))
@@ -90,7 +87,6 @@ open class MobilePaymentPluginSdkMethods(
             "AuthenticationToken",
             params["authenticationToken"] as String
         )
-        request.add("MessageID", "5")
         request.add("MerchantID", params["merchantID"] as String)
         request.add("TransactionID", params["transactionID"] as String)
         request.add("CurrencyISOCode", params["currencyISOCode"] as String)
@@ -98,7 +94,6 @@ open class MobilePaymentPluginSdkMethods(
         request.add(
             "OriginalTransactionID", params["originalTransactionID"] as String
         )
-        request.add("Version", "1.0")
         val paymentService = SmartRouteRefundService(activity)
         paymentService.process(
             request,
@@ -117,7 +112,6 @@ open class MobilePaymentPluginSdkMethods(
             "AuthenticationToken",
             params["authenticationToken"] as String
         )
-        request.add("MessageID", "5")
         request.add("MerchantID", params["merchantID"] as String)
         request.add("TransactionID", params["transactionID"] as String)
         request.add("CurrencyISOCode", params["currencyISOCode"] as String)
@@ -145,12 +139,10 @@ open class MobilePaymentPluginSdkMethods(
             "AuthenticationToken",
             params["authenticationToken"] as String
         )
-        request.add("MessageID", "2")
         request.add("MerchantID", params["merchantID"] as String)
         request.add(
             "OriginalTransactionID", params["originalTransactionID"] as String
         )
-        request.add("Version", "1.0")
         val paymentService = SmartRouteInquiryService(activity)
         paymentService.process(
             request,

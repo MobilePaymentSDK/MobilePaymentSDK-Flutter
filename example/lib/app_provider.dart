@@ -1,4 +1,5 @@
 import 'dart:developer' as log;
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mobile_payment_plugin/models/completion_model.dart';
 import 'package:mobile_payment_plugin/models/errors.dart';
@@ -13,30 +14,44 @@ import 'package:mobile_payment_plugin/models/refund_model.dart';
 import 'helper/shared_preferences.dart';
 
 class MobilePaymentProvider extends ChangeNotifier {
-  String amount = '';
-  String amountOtherAPI = '';
+  TextEditingController amount = TextEditingController(text: '100');
+  TextEditingController currency = TextEditingController(text: '682');
   String tokensText = '';
-  String currency = '';
+  //String currency = '';
   String currencyOtherAPI = '';
   String transactionId = '';
   String transactionIdOtherApi = '';
   String originalTransactionID = '';
+  String agreementId = '';
+  String itemId = '1';
+  int quantity = 1;
   bool isThreeDSSecure = true;
   bool shouldTokenizeCard = true;
   bool isCardScanEnable = true;
-  bool isSaveCardEnable = true;
   Language selectedLangVale = Language.ar;
   PaymentType selectedPaymentTypeTypeValue = PaymentType.sale;
-  final List<CardType> cardsType = [
-    CardType.visa,
-    CardType.mastercard,
-    CardType.amex,
-    CardType.diners,
-    CardType.union,
-    CardType.jcb,
-    CardType.discover,
-    CardType.mada,
-  ];
+  final List<CardType> cardsType = Platform.isIOS
+      ? [
+          CardType.visa,
+          CardType.mastercard,
+          CardType.amex,
+          CardType.diners,
+          CardType.union,
+          CardType.jcb,
+          CardType.discover,
+          CardType.mada,
+          CardType.applePay,
+        ]
+      : [
+          CardType.visa,
+          CardType.mastercard,
+          CardType.amex,
+          CardType.diners,
+          CardType.union,
+          CardType.jcb,
+          CardType.discover,
+          CardType.mada,
+        ];
   List<CardType> cardsSelected = [
     CardType.mastercard,
     CardType.visa,
@@ -69,49 +84,48 @@ class MobilePaymentProvider extends ChangeNotifier {
     required Function(Response result) onResponse,
   }) async {
     try {
-      List<String> tokens = tokensText.split(',');
-      tokens =
-          tokensText.isNotEmpty ? tokens.map((e) => e.trim()).toList() : [];
       List<String> tokenInSharedPreferences =
           SharedPreferencesApp.getArray(key: 'tokens') ?? [];
       await _mobilePaymentSdk.openPaymentPage(
         OpenPayment(
-          amount: amount,
-          tokens: [...tokens, ...tokenInSharedPreferences],
-          currency: currency,
+          amount: amount.text,
+          tokens: [ ...tokenInSharedPreferences],
+          currency: currency.text,
           agreementType: AgreementType.RECURRING,
           transactionId: transactionId,
           isThreeDSSecure: isThreeDSSecure,
           shouldTokenizeCard: shouldTokenizeCard,
           isCardScanEnable: isCardScanEnable,
-          isSaveCardEnable: isSaveCardEnable,
           langCode: selectedLangVale,
           paymentType: selectedPaymentTypeTypeValue,
           cardsType: cardsSelected,
+          agreementId: agreementId,
+          quantity: quantity.toString(),
+          itemId: itemId,
         ),
         onPaymentResponse: (result) async {
           onResponse(result);
+          generateTransactionId();
+          log.log('hey lll');
           log.log('Card Token 2');
+          log.log(result.toString(),name: 'result');
           log.log(result.token ?? '');
           log.log(result.statusCode?.toString() ?? '');
           log.log((result.token == null).toString());
           log.log(result.statusDescription ?? '');
-          if (result.saveCard != null) {
-            if (result.saveCard!) {
+          if (result.shouldStoreCard) {
               if (result.token != null) {
-                tokens.add(result.token!);
-                if (SharedPreferencesApp.getArray(key: 'tokens') != null) {
-                  await SharedPreferencesApp.remove(key: 'tokens');
+                if(tokenInSharedPreferences.contains(result.token!)){
+
+                }else{
+                  tokenInSharedPreferences.add(result.token!);
                 }
-                await SharedPreferencesApp.setArray(
-                  key: 'tokens',
-                  array: tokens,
-                );
+                await SharedPreferencesApp.setArray(key: 'tokens', array: tokenInSharedPreferences);
+
 
                 tokensText = '$tokensText${result.token!},';
                 notifyListeners();
               }
-            }
           }
         },
         onPaymentFailed: (result) {
@@ -122,11 +136,14 @@ class MobilePaymentProvider extends ChangeNotifier {
               amount: result.amount,
               messageID: int.tryParse(result.messageID ?? "0"),
               transactionID: result.transactionId,
-              statusCode: int.tryParse(result.statusCode ?? "0"),
+                originalTransactionID: result.originalTransactionID,
+                statusCode: int.tryParse(result.statusCode ?? "0"),
               currencyISOCode: result.currencyISOCode,
               merchantID: result.merchantID,
+              description: result.description
             ),
           );
+          generateTransactionId();
         },
         onDeleteCardResponse: (onDeleteCard) async {
           if (onDeleteCard.deleted) {
@@ -138,6 +155,7 @@ class MobilePaymentProvider extends ChangeNotifier {
             SharedPreferencesApp.remove(key: 'tokens');
             SharedPreferencesApp.setArray(key: 'tokens', array: allTokens);
           }
+          notifyListeners();
         },
       );
     } on Errors catch (e) {
@@ -156,10 +174,10 @@ class MobilePaymentProvider extends ChangeNotifier {
     try {
       await _mobilePaymentSdk.refund(
         Refund(
-          amount: amountOtherAPI,
-          currencyISOCode: currencyOtherAPI,
+          amount: amount.text,
+          currencyISOCode: currency.text,
           originalTransactionID: originalTransactionID,
-          transactionID: transactionIdOtherApi,
+          transactionID: transactionId,
         ),
         onPaymentResponse: (result) async {
           onResponse(result);
@@ -168,6 +186,7 @@ class MobilePaymentProvider extends ChangeNotifier {
           log.log(result.statusCode?.toString() ?? '');
           log.log((result.token == null).toString());
           log.log(result.statusDescription ?? '');
+          generateTransactionId();
         },
         onPaymentFailed: (result) {
           onResponse(
@@ -177,11 +196,14 @@ class MobilePaymentProvider extends ChangeNotifier {
               amount: result.amount,
               messageID: int.tryParse(result.messageID ?? "0"),
               transactionID: result.transactionId,
+              originalTransactionID: result.originalTransactionID,
               statusCode: int.tryParse(result.statusCode ?? "0"),
               currencyISOCode: result.currencyISOCode,
               merchantID: result.merchantID,
+              description: result.description,
             ),
           );
+          generateTransactionId();
         },
       );
     } on Errors catch (e) {
@@ -200,10 +222,10 @@ class MobilePaymentProvider extends ChangeNotifier {
     try {
       await _mobilePaymentSdk.completion(
         Completion(
-          amount: amountOtherAPI,
-          currencyISOCode: currencyOtherAPI,
+          amount: amount.text,
+          currencyISOCode: currency.text,
           originalTransactionID: originalTransactionID,
-          transactionID: transactionIdOtherApi,
+          transactionID: transactionId,
         ),
         onPaymentResponse: (result) async {
           onResponse(result);
@@ -212,6 +234,7 @@ class MobilePaymentProvider extends ChangeNotifier {
           log.log(result.statusCode?.toString() ?? '');
           log.log((result.token == null).toString());
           log.log(result.statusDescription ?? '');
+          generateTransactionId();
         },
         onPaymentFailed: (result) {
           onResponse(
@@ -221,11 +244,15 @@ class MobilePaymentProvider extends ChangeNotifier {
               amount: result.amount,
               messageID: int.tryParse(result.messageID ?? "0"),
               transactionID: result.transactionId,
+              originalTransactionID: result.originalTransactionID,
               statusCode: int.tryParse(result.statusCode ?? "0"),
               currencyISOCode: result.currencyISOCode,
               merchantID: result.merchantID,
+              paymentMethod: result.paymentMethod,
+                shouldStoreCard: shouldTokenizeCard
             ),
           );
+          generateTransactionId();
         },
       );
     } on Errors catch (e) {
@@ -253,6 +280,7 @@ class MobilePaymentProvider extends ChangeNotifier {
           log.log(result.statusCode?.toString() ?? '');
           log.log((result.token == null).toString());
           log.log(result.statusDescription ?? '');
+          generateTransactionId();
         },
         onPaymentFailed: (result) {
           onResponse(
@@ -262,11 +290,16 @@ class MobilePaymentProvider extends ChangeNotifier {
               amount: result.amount,
               messageID: int.tryParse(result.messageID ?? "0"),
               transactionID: result.transactionId,
+              originalTransactionID: result.originalTransactionID,
               statusCode: int.tryParse(result.statusCode ?? "0"),
               currencyISOCode: result.currencyISOCode,
               merchantID: result.merchantID,
+              paymentMethod: result.paymentMethod,
+              shouldStoreCard: shouldTokenizeCard,
+              description: result.description
             ),
           );
+          generateTransactionId();
         },
       );
     } on Errors catch (e) {
@@ -279,37 +312,33 @@ class MobilePaymentProvider extends ChangeNotifier {
   }
 
   void onChangeAmount(String value) {
-    amount = value.trim();
+    amount.text = value.trim();
     notifyListeners();
   }
 
-  void onChangeAmountOtherAPI(String value) {
-    amountOtherAPI = value.trim();
+  void onChangeMerchantId(String value) {
+    //merchantId = value.trim();
     notifyListeners();
   }
 
-  void onChangeToken(String value) {
-    tokensText = value.trim();
+  void onChangeSecretKey(String value) {
+    //secretKey = value.trim();
     notifyListeners();
   }
+
+  void onChangeAppleMerchantId(String value) {
+    //appleMerchantId = value.trim();
+    notifyListeners();
+  }
+
 
   void onChangeCurrency(String value) {
-    currency = value.trim();
+    currency.text = value.trim();
     notifyListeners();
   }
 
-  void onChangeCurrencyOtherAPI(String value) {
-    currencyOtherAPI = value.trim();
-    notifyListeners();
-  }
-
-  void onChangeTransactionId(String value) {
-    transactionId = value.trim();
-    notifyListeners();
-  }
-
-  void onChangeTransactionIdOtherApi(String value) {
-    transactionIdOtherApi = value.trim();
+  void generateTransactionId() {
+    transactionId = PaymentPlatform.generateTransactionId();
     notifyListeners();
   }
 
@@ -333,11 +362,6 @@ class MobilePaymentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void onChangeSaveCardEnable(bool value) {
-    isSaveCardEnable = value;
-    notifyListeners();
-  }
-
   void onChangeLang(Language value) {
     selectedLangVale = value;
     notifyListeners();
@@ -345,6 +369,26 @@ class MobilePaymentProvider extends ChangeNotifier {
 
   void onChangePaymentTypeType(PaymentType value) {
     selectedPaymentTypeTypeValue = value;
+    notifyListeners();
+  }
+
+  void onChangeAgreementId(String value) {
+    agreementId = value;
+    notifyListeners();
+  }
+
+  void onChangeItemId(String value) {
+    itemId = value;
+    notifyListeners();
+  }
+
+  void onChangeQuantity(String value) {
+    quantity = int.tryParse(value) ?? 0;
+    notifyListeners();
+  }
+
+  void clearData() {
+    originalTransactionID = '';
     notifyListeners();
   }
 
@@ -360,3 +404,4 @@ class MobilePaymentProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
+

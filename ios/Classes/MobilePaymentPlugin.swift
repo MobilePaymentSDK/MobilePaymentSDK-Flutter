@@ -5,14 +5,14 @@ import MobilePaymentSDK
 public class MobilePaymentPlugin: NSObject, FlutterPlugin {
     private var result: FlutterResult?
     public static let shared = MobilePaymentPlugin()
-
+    
     override private init() {}
-  public static func register(with registrar: FlutterPluginRegistrar) {
+    public static func register(with registrar: FlutterPluginRegistrar) {
         let instance = MobilePaymentPlugin()
         let channel = FlutterMethodChannel(name: "samples.flutter.dev/paymentIOS", binaryMessenger: registrar.messenger())
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
-
+    
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         MobilePaymentPlugin.shared.result = result
         switch call.method {
@@ -79,22 +79,23 @@ public class MobilePaymentPlugin: NSObject, FlutterPlugin {
             result(FlutterMethodNotImplemented)
         }
     }
-       func handleInitializeSDK(args: [String: Any]) {
-          guard let merchantId = args["merchantId"] as? String,
-                let secretKey = args["secretKey"] as? String,
-                let appleMerchantId = args["appleMerchantId"] as? String
-          else {
-              result?(FlutterError(code: "INVALID_ARGUMENTS", message: "Invalid payment data", details: nil))
-              return
-          }
 
-            try? MobilePaymentSDK.initializeSDK(
-                withMerchantID: merchantId,
-                secretKey: secretKey,
-                delegate: MobilePaymentPlugin.shared,
-                appleMerchantId: appleMerchantId
-            )
+    func handleInitializeSDK(args: [String: Any]) {
+        guard let merchantId = args["merchantId"] as? String,
+              let secretKey = args["secretKey"] as? String,
+              let appleMerchantId = args["appleMerchantId"] as? String
+        else {
+            result?(FlutterError(code: "INVALID_ARGUMENTS", message: "Invalid payment data", details: nil))
+            return
         }
+        
+        try? MobilePaymentSDK.initializeSDK(
+            withMerchantID: merchantId,
+            secretKey: secretKey,
+            delegate: MobilePaymentPlugin.shared,
+            appleMerchantId: appleMerchantId
+        )
+    }
     func handleOpenPaymentPage(viewController: UIViewController, args: [String: Any], result: @escaping FlutterResult) {
         MobilePaymentPlugin.shared.result = result
         // Extract necessary data from Flutter method call arguments
@@ -158,41 +159,54 @@ public class MobilePaymentPlugin: NSObject, FlutterPlugin {
             agreementType: agreementType
         )
     }
-
-
+    
+    
 }
 
 extension MobilePaymentPlugin: MobilePaymentSDKDelegate {
     public func onPaymentSuccess(withTransactionId transactionId: String, infoDictionary: [String: Any], tokenizedCard: String?, shouldStoreCard: Bool) {
-
-        var newInfoDictionary = infoDictionary
-
-        newInfoDictionary["tokenizedCard"] = tokenizedCard
+        
+        var newInfoDictionary: [String: Any] = [:]
+        
+        newInfoDictionary["tokenizedCard"] = tokenizedCard ?? ""
         newInfoDictionary["shouldStoreCard"] = shouldStoreCard
         newInfoDictionary["transactionId"] = transactionId
         newInfoDictionary["code"] = "200"
+        
+        for item in infoDictionary {
+            newInfoDictionary[item.key] = item.value
+        }
         MobilePaymentPlugin.shared.result?(newInfoDictionary)
     }
-
+    
     public func onPaymentError(_ error: MobilePaymentError, transactionId: String) {
-        var newInfoDictionary = error.userInfo
+        var newInfoDictionary: [String: Any?] = [:]
+
         newInfoDictionary["transactionId"] = transactionId
         newInfoDictionary["code"] = error.code
+
+        for item in error.userInfo {
+            if let key = item.key as? String {
+                newInfoDictionary[key] = item.value
+            }
+        }
+        
         MobilePaymentPlugin.shared.result?(newInfoDictionary)
     }
-
+    
     public func onPaymentCancelled(transactionId: String) {
         MobilePaymentPlugin.shared.result?(FlutterError(code: "5002", message: "Payment cancelled by user", details: ["transactionId": transactionId]))
     }
-
+    
     public func didTapDeleteCard(_ withToken: String) {
         let object = ["cardToken": withToken]
         MobilePaymentPlugin.shared.result?(object)
     }
-
+    
     public func onPaymentCompletion(withResponse response: MobilePaymentGatewayResponse) {
-        let object = ["response": response.getGatewayRawResponse()]
-        MobilePaymentPlugin.shared.result?(object)
+        var dictionary = response.getGatewayRawResponse()
+        dictionary?["shouldStoreCard"] = response.getUserSavedCard()
+        MobilePaymentPlugin.shared.result?(dictionary)
     }
 }
 

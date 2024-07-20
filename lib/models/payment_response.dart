@@ -1,4 +1,4 @@
-class Response {
+final class Response {
   final String? amount;
   final int? approvalCode;
   final String? cardNumber;
@@ -8,14 +8,17 @@ class Response {
   final String? gatewayStatusDescription;
   final String? merchantID;
   final int? messageID;
-  final int? paymentMethod;
   final int? rrn;
   final String? secureHash;
   final int? statusCode;
+  final String? paymentMethod;
   final String? statusDescription;
   final String? token;
   final String? transactionID;
+  final String? originalTransactionID;
   final String? responseHashMatch;
+  final String? description;
+  final bool shouldStoreCard;
   final bool? saveCard;
 
   const Response({
@@ -30,12 +33,15 @@ class Response {
     this.messageID,
     this.rrn,
     this.secureHash,
-    this.paymentMethod,
     this.statusCode,
     this.statusDescription,
     this.token,
+    this.paymentMethod,
     this.transactionID,
+    this.originalTransactionID,
     this.responseHashMatch,
+    this.description,
+    this.shouldStoreCard= false,
     this.saveCard,
   });
 
@@ -50,40 +56,54 @@ class Response {
       gatewayStatusDescription: json["Response.GatewayStatusDescription"],
       merchantID: json["Response.MerchantID"],
       messageID: int.tryParse(json["Response.MessageID"]),
-      paymentMethod: int.tryParse(json["Response.PaymentMethod"]),
       rrn: int.tryParse(json["Response.RRN"]),
       secureHash: json["Response.SecureHash"],
       statusCode: int.tryParse(json["Response.StatusCode"]),
+      paymentMethod: json["Response.PaymentMethod"].toString(),
       statusDescription: json["Response.StatusDescription"],
       token: json["Response.Token"],
       transactionID: json["Response.TransactionID"],
+      originalTransactionID: json['Response.OriginalTransactionID'],
       responseHashMatch: json["ResponseHashMatch"],
-      saveCard: json["SaveCard"] == null
+      description: json["description"] ?? json["Description"],
+      shouldStoreCard: json["TokenizeCard"]== null
+          ? false
+          : (json["TokenizeCard"]).toString().toLowerCase() == "true"
+          ? true
+          : false,
+      saveCard: json["TokenizeCard"] == null
           ? null
-          : (json["SaveCard"]).toString().toLowerCase() == "true"
+          : (json["TokenizeCard"]).toString().toLowerCase() == "true"
               ? true
               : false,
     );
   }
   factory Response.fromIOSJsonSuccess(Map<Object?, Object?> json) {
     return Response(
-      amount: json["Response.Amount"].toString(),
+      amount: json["Response.Amount"]?.toString(),
       approvalCode: int.tryParse(json["Response.ApprovalCode"].toString()),
-      cardNumber: json["Response.CardNumber"].toString(),
-      currencyISOCode: json["Response.CurrencyISOCode"].toString(),
-      gatewayName: json["Response.GatewayName"].toString(),
+      cardNumber: json["Response.CardNumber"]?.toString(),
+      currencyISOCode: json["Response.CurrencyISOCode"]?.toString(),
+      gatewayName: json["Response.GatewayName"]?.toString(),
       gatewayStatusCode: int.tryParse(json["Response.GatewayStatusCode"].toString()),
-      gatewayStatusDescription: json["Response.GatewayStatusDescription"].toString(),
-      merchantID: json["Response.MerchantID"].toString(),
+      gatewayStatusDescription: json["Response.GatewayStatusDescription"]?.toString(),
+      merchantID: json["Response.MerchantID"]?.toString(),
       messageID: int.tryParse(json["Response.MessageID"].toString()),
-      paymentMethod: int.tryParse(json["Response.PaymentMethod"].toString()),
       rrn: int.tryParse(json["Response.RRN"].toString()),
-      secureHash: json["Response.SecureHash"].toString(),
+      secureHash: json["Response.SecureHash"]?.toString(),
       statusCode: int.tryParse(json["Response.StatusCode"].toString()),
-      statusDescription: json["Response.StatusDescription"].toString(),
-      token: json["Response.Token"].toString(),
-      transactionID: json["Response.TransactionID"].toString(),
-      responseHashMatch: json["ResponseHashMatch"].toString(),
+      paymentMethod: json["Response.PaymentMethod"].toString(),
+      statusDescription: json["Response.StatusDescription"]?.toString(),
+      token: json["Response.Token"]?.toString(),
+      transactionID: json["Response.TransactionID"]?.toString(),
+      originalTransactionID: json['Response.OriginalTransactionID']?.toString(),
+      responseHashMatch: json["ResponseHashMatch"]?.toString(),
+      description: json["description"]?.toString(),
+      shouldStoreCard: json["shouldStoreCard"] == null
+          ? false
+          : (json["shouldStoreCard"]).toString().toLowerCase() == "true"
+          ? true
+          : false,
       saveCard: json["SaveCard"] == null
           ? null
           : (json["SaveCard"]).toString().toLowerCase() == "true"
