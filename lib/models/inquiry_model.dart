@@ -1,14 +1,11 @@
 import '../mobile_payment_plugin_errors_handler.dart';
+import 'initialize_sdk.dart';
 
 class Inquiry {
   final String originalTransactionID;
-  final String authenticationToken;
-  final String merchantID;
 
   Inquiry({
     required this.originalTransactionID,
-    this.authenticationToken = '<<Will be provided by support>>',
-    this.merchantID = '<<Will be provided by support>>',
   }) : assert(ErrorHandler.originalTransactionID(originalTransactionID));
 
   Map<String, dynamic> toJson() {
@@ -17,11 +14,11 @@ class Inquiry {
     };
   }
 
-  Map<String, dynamic> toJsonAndroid() {
+  Map<String, dynamic> toJsonAndroid(InitializeSDK initializeSDK) {
     return {
       "originalTransactionID": originalTransactionID.trim(),
-      "authenticationToken": authenticationToken,
-      "merchantID": merchantID,
+      "authenticationToken": initializeSDK.secretKey,
+      "merchantID": initializeSDK.merchantId,
     };
   }
 }

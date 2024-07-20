@@ -7,20 +7,23 @@ import 'package:mobile_payment_plugin/models/refund_model.dart';
 import 'mobile_payment_plugin_platform_interface.dart';
 import 'models/completion_model.dart';
 import 'models/errors.dart';
-import 'models/initializeSDK.dart';
+import 'models/initialize_sdk.dart';
 import 'models/on_delete.dart';
 import 'models/open_payment.dart';
 import 'models/payment_failed_response.dart';
 import 'models/payment_response.dart';
 
 class MobilePaymentSdk extends PaymentPlatform {
-  final _methodChannel = const MethodChannel('mobile_payment_plugin');
-  final _methodChannelIOS =
-      const MethodChannel('samples.flutter.dev/paymentIOS');
+  static const MethodChannel _methodChannel =
+      MethodChannel('mobile_payment_plugin');
+  static const MethodChannel _methodChannelIOS =
+      MethodChannel('samples.flutter.dev/paymentIOS');
 
-  @override
-  Future<void> initializeSDK(InitializeSDK initializeSDK) async {
+  static late InitializeSDK _initializeSDK;
+
+  static Future<void> initializeSDK(InitializeSDK initializeSDK) async {
     try {
+      _initializeSDK = initializeSDK;
       if (Platform.isAndroid) {
       } else if (Platform.isIOS) {
         await _methodChannelIOS.invokeMethod(
@@ -54,7 +57,7 @@ class MobilePaymentSdk extends PaymentPlatform {
       if (Platform.isAndroid) {
         await _methodChannel.invokeMethod(
           'paymentMethod',
-          openPayment.toJson(),
+          openPayment.toJson(_initializeSDK),
         );
         _methodChannel.setMethodCallHandler((call) async {
           if (call.method == 'getResult') {
@@ -81,7 +84,7 @@ class MobilePaymentSdk extends PaymentPlatform {
       } else if (Platform.isIOS) {
         final Map<Object?, Object?> resp = await _methodChannelIOS.invokeMethod(
           'openPaymentPage',
-          openPayment.toIOSJson(),
+          openPayment.toIOSJson(_initializeSDK),
         );
         String status = resp["code"].toString();
         if (status.toLowerCase() == '200') {
@@ -115,7 +118,7 @@ class MobilePaymentSdk extends PaymentPlatform {
       if (Platform.isAndroid) {
         await _methodChannel.invokeMethod(
           'refund',
-          refund.toJsonAndroid(),
+          refund.toJsonAndroid(_initializeSDK),
         );
         _methodChannel.setMethodCallHandler((call) async {
           if (call.method == 'getResult') {
@@ -165,7 +168,7 @@ class MobilePaymentSdk extends PaymentPlatform {
       if (Platform.isAndroid) {
         await _methodChannel.invokeMethod(
           'completion',
-          completion.toJsonAndroid(),
+          completion.toJsonAndroid(_initializeSDK),
         );
 
         _methodChannel.setMethodCallHandler((call) async {
@@ -217,7 +220,7 @@ class MobilePaymentSdk extends PaymentPlatform {
       if (Platform.isAndroid) {
         await _methodChannel.invokeMethod(
           'inquiry',
-          inquiry.toJsonAndroid(),
+          inquiry.toJsonAndroid(_initializeSDK),
         );
         _methodChannel.setMethodCallHandler((call) async {
           if (call.method == 'getResult') {

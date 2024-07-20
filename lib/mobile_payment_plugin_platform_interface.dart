@@ -4,8 +4,8 @@ import 'package:mobile_payment_plugin/models/inquiry_model.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'models/completion_model.dart';
+import 'models/initialize_sdk.dart';
 import 'models/on_delete.dart';
-import 'models/initializeSDK.dart';
 import 'models/open_payment.dart';
 import 'models/payment_failed_response.dart';
 import 'models/payment_response.dart';
@@ -22,7 +22,7 @@ abstract class PaymentPlatform extends PlatformInterface {
     return (timestamp + random).toString();
   }
 
-  Future<void> initializeSDK(InitializeSDK initializeSDK);
+
 
   Future<void> openPaymentPage(
     OpenPayment openPayment, {

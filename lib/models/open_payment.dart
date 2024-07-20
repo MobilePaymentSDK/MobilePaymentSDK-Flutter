@@ -1,9 +1,8 @@
 import '../mobile_payment_plugin_errors_handler.dart';
 import '../mobile_payment_plugin_platform_interface.dart';
+import 'initialize_sdk.dart';
 
 class OpenPayment {
-  final String merchantID;
-  final String authenticationToken;
   final String amount;
   final List<String> tokens;
   final String currency;
@@ -26,8 +25,6 @@ class OpenPayment {
   final String clientIPaddress;
 
   OpenPayment({
-    this.authenticationToken = '<<Will be provided by support>>',
-    this.merchantID = '<<Will be provided by support>>',
     required this.amount,
     this.tokens = const [],
     required this.currency,
@@ -53,17 +50,15 @@ class OpenPayment {
     ],
   }) : assert(
           ErrorHandler.amount(amount) &&
-              ErrorHandler.authenticationToken(authenticationToken) &&
               ErrorHandler.transactionId(transactionId) &&
               ErrorHandler.currency(currency) &&
-              ErrorHandler.merchantID(merchantID) &&
               ErrorHandler.cardsType(cardsType),
         );
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson(InitializeSDK initializeSDK) {
     return {
-      "authenticationToken": authenticationToken,
-      "merchantID": merchantID,
+      "authenticationToken": initializeSDK.secretKey,
+      "merchantID": initializeSDK.merchantId,
       "amount": amount.trim(),
       "tokens": tokens,
       "currency": currency.trim(),
@@ -84,10 +79,10 @@ class OpenPayment {
     };
   }
 
-  Map<String, dynamic> toIOSJson() {
+  Map<String, dynamic> toIOSJson(InitializeSDK initializeSDK) {
     return {
-      "authenticationToken": authenticationToken,
-      "merchantID": merchantID,
+      "authenticationToken": initializeSDK.secretKey,
+      "merchantID": initializeSDK.merchantId,
       "amount": amount.trim(),
       "tokens": tokens,
       "currency": currency.trim(),

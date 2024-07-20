@@ -18,13 +18,9 @@ class OtherAPIMobilePaymentExample extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Image.asset(
-            'assets/images/ic_launcher-playstore.png',
-            height: 100,
-          ),
           const Expanded(
             child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 15),
+              padding: EdgeInsets.symmetric(horizontal: 15,vertical: 10),
               physics: ClampingScrollPhysics(),
               child: OtherApiFields(),
             ),

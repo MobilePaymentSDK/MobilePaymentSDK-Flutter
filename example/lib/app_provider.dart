@@ -2,7 +2,7 @@ import 'dart:developer' as log;
 import 'package:flutter/material.dart';
 import 'package:mobile_payment_plugin/models/completion_model.dart';
 import 'package:mobile_payment_plugin/models/errors.dart';
-import 'package:mobile_payment_plugin/models/initializeSDK.dart';
+import 'package:mobile_payment_plugin/models/initialize_sdk.dart';
 import 'package:mobile_payment_plugin/models/inquiry_model.dart';
 import 'package:mobile_payment_plugin/models/open_payment.dart';
 import 'package:mobile_payment_plugin/mobile_payment_plugin_platform_interface.dart';
@@ -48,11 +48,13 @@ class MobilePaymentProvider extends ChangeNotifier {
     required Function(String code, String error) onError,
   }) async {
     try {
-      await _mobilePaymentSdk.initializeSDK(const InitializeSDK(
-        merchantId: "<<Will be provided by support>>",
-        secretKey: "<<Will be provided by support>>",
-        appleMerchantId: "<<Will be provided by support>>",
-      ));
+      await MobilePaymentSdk.initializeSDK(
+        InitializeSDK(
+          merchantId: "<<Will be provided by support>>",
+          secretKey: "<<Will be provided by support>>",
+          appleMerchantId: "<<Will be provided by support>>",
+        ),
+      );
     } on Errors catch (e) {
       log.log(e.code.toString());
       log.log(e.message);
@@ -70,12 +72,12 @@ class MobilePaymentProvider extends ChangeNotifier {
       List<String> tokens = tokensText.split(',');
       tokens =
           tokensText.isNotEmpty ? tokens.map((e) => e.trim()).toList() : [];
-/*      List<String> tokenInSharedPreferences =
-          SharedPreferencesApp.getArray(key: 'tokens') ?? [];*/
+      List<String> tokenInSharedPreferences =
+          SharedPreferencesApp.getArray(key: 'tokens') ?? [];
       await _mobilePaymentSdk.openPaymentPage(
         OpenPayment(
           amount: amount,
-          //tokens: [...tokens, ...tokenInSharedPreferences],
+          tokens: [...tokens, ...tokenInSharedPreferences],
           currency: currency,
           agreementType: AgreementType.RECURRING,
           transactionId: transactionId,
@@ -96,7 +98,7 @@ class MobilePaymentProvider extends ChangeNotifier {
           log.log(result.statusDescription ?? '');
           if (result.saveCard != null) {
             if (result.saveCard!) {
-              /* if (result.token != null) {
+              if (result.token != null) {
                 tokens.add(result.token!);
                 if (SharedPreferencesApp.getArray(key: 'tokens') != null) {
                   await SharedPreferencesApp.remove(key: 'tokens');
@@ -108,7 +110,7 @@ class MobilePaymentProvider extends ChangeNotifier {
 
                 tokensText = '$tokensText${result.token!},';
                 notifyListeners();
-              }*/
+              }
             }
           }
         },
@@ -127,7 +129,7 @@ class MobilePaymentProvider extends ChangeNotifier {
           );
         },
         onDeleteCardResponse: (onDeleteCard) async {
-          /* if (onDeleteCard.deleted) {
+          if (onDeleteCard.deleted) {
             List<String> allTokens =
                 SharedPreferencesApp.getArray(key: 'tokens') ?? [];
             allTokens.remove(onDeleteCard.token);
@@ -135,7 +137,7 @@ class MobilePaymentProvider extends ChangeNotifier {
             log.log(allTokens.length.toString());
             SharedPreferencesApp.remove(key: 'tokens');
             SharedPreferencesApp.setArray(key: 'tokens', array: allTokens);
-          }*/
+          }
         },
       );
     } on Errors catch (e) {
@@ -210,20 +212,6 @@ class MobilePaymentProvider extends ChangeNotifier {
           log.log(result.statusCode?.toString() ?? '');
           log.log((result.token == null).toString());
           log.log(result.statusDescription ?? '');
-          if (result.saveCard != null) {
-            if (result.saveCard!) {
-              /* if (result.token != null) {
-                tokens.add(result.token!);
-                if (SharedPreferencesApp.getArray(key: 'tokens') != null) {
-                  await SharedPreferencesApp.remove(key: 'tokens');
-                }
-                await SharedPreferencesApp.setArray(
-                  key: 'tokens',
-                  array: tokens,
-                );
-              }*/
-            }
-          }
         },
         onPaymentFailed: (result) {
           onResponse(
@@ -257,7 +245,6 @@ class MobilePaymentProvider extends ChangeNotifier {
       await _mobilePaymentSdk.inquiry(
         Inquiry(
           originalTransactionID: originalTransactionID,
-          //  transactionID: transactionIdOtherApi,
         ),
         onPaymentResponse: (result) async {
           onResponse(result);
@@ -266,9 +253,6 @@ class MobilePaymentProvider extends ChangeNotifier {
           log.log(result.statusCode?.toString() ?? '');
           log.log((result.token == null).toString());
           log.log(result.statusDescription ?? '');
-          if (result.saveCard != null) {
-            if (result.saveCard!) {}
-          }
         },
         onPaymentFailed: (result) {
           onResponse(

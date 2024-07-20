@@ -13,5 +13,3 @@ visa_debug_encryption_key = nca_demo_visa_encryption.crt
 visa_debug_root_certificate_key = certificates.pem
 union_logo = logoUnion
 diners_logo = logoDiners
-jcb_logo = logoJcb
-amex_logo = logoAmex

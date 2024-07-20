@@ -32,20 +32,15 @@ class _HomeMobilePaymentExampleState extends State<HomeMobilePaymentExample> {
   }
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("MobilePaymentSDK"),
       ),
       body: Column(
         children: [
-          Image.asset(
-            'assets/images/ic_launcher-playstore.png',
-            height: 100,
-          ),
           const Expanded(
             child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 15),
+              padding: EdgeInsets.symmetric(horizontal: 15,vertical: 10),
               physics: ClampingScrollPhysics(),
               child: PaymentFields(),
             ),

@@ -8,7 +8,7 @@ import 'helper/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  //await SharedPreferencesApp.init();
+  await SharedPreferencesApp.init();
   runApp(const ExampleMobilePaymentSDK());
 }
 

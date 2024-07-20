@@ -1,4 +1,4 @@
-group 'dev.sdk.mobile_payment_plugin'
+group 'com.sdk.mobilepaymentplugin'
 version '1.0-SNAPSHOT'
 
 buildscript {
@@ -6,12 +6,13 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        mavenCentral()
         maven { url uri('https://jitpack.io') }
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:8.0.2'
-        classpath 'com.google.gms:google-services:4.4.0'
+        classpath 'com.google.gms:google-services:4.4.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 
@@ -30,9 +31,9 @@ apply plugin: 'kotlin-android'
 
 android {
 
-    namespace 'dev.sdk.mobile_payment_plugin'
+    namespace 'com.sdk.mobilepaymentplugin'
 
-    compileSdk 33
+    compileSdk 34
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -77,7 +78,7 @@ android {
 dependencies {
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
     testImplementation 'org.mockito:mockito-core:5.0.0'
-    implementation('com.github.MobilePaymentSDK:MobilePaymentSDK-Android:1.0.5') {
+    implementation('com.github.MobilePaymentSDK:MobilePaymentSDK-Android:1.1.2') {
         configurations {
             implementation.exclude module: 'lifecycle-viewmodel-ktx'
             implementation.exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
