@@ -1,0 +1,12 @@
+BaseURL= <<Will be provided by support>>
+PaymentEndPoint= <<Will be provided by support>>
+ApproveEndPoint= <<Will be provided by support>>
+InquiryEndPoint= <<Will be provided by support>>
+RefundEndPoint= <<Will be provided by support>>
+CompletionEndPoint= <<Will be provided by support>>
+CardTypeEndPoint= <<Will be provided by support>>
+SavedCardEndPoint= <<Will be provided by support>>
+ThreeDSVersionEndPoint= <<Will be provided by support>>
+ByPassSecureHashValidationForResponse=N
+Production=false
+Timeout=60

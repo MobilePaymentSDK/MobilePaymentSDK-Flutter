@@ -1,0 +1,15 @@
+PaymentURL = <<Will be provided by support>>
+ApproveURL = <<Will be provided by support>>
+InquiryURL = <<Will be provided by support>>
+RefundURL  = <<Will be provided by support>>
+TimeOutValue = 100
+isProduction = NO (For Staging env.) YES (for Production env.)
+logData = YES (for testing purposes only, should be disabled on Production).
+mastercard_logo = logoMasterCard
+mastercard_debug_encryption_key = nca_demo_mastercard_encryption.crt
+mastercard_debug_root_certificate_key = certificates.pem
+visa_logo = logoVisa
+visa_debug_encryption_key = nca_demo_visa_encryption.crt
+visa_debug_root_certificate_key = certificates.pem
+union_logo = logoUnion
+diners_logo = logoDiners
