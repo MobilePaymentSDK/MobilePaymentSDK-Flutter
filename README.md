@@ -21,7 +21,7 @@ buildscript {
     url uri("https://maven.pkg.github.com/MobilePaymentSDK/MobilePaymentSDK-Android")
     credentials{
         username = "GITHUB_USERNAME"
-        password= "GITHUB_TOKEN "
+        password= "GITHUB_TOKEN"
     }
 }
     }
@@ -36,7 +36,7 @@ allprojects {
     url uri("https://maven.pkg.github.com/MobilePaymentSDK/MobilePaymentSDK-Android")
     credentials{
         username = "GITHUB_USERNAME"
-        password= "GITHUB_TOKEN "
+        password= "GITHUB_TOKEN"
     }
 }
     }
@@ -47,13 +47,37 @@ allprojects {
 
 ```
 android {
-	compileSdk 33
+	compileSdk 35
 	defaultConfig {
-	// other code
+	// other code for Java code
 		minSdkVersion 24
-		targetSdkVersion 33
+		targetSdkVersion 35
 		multiDexEnabled true
 	}
+
+	// After android block
+	configurations.all {
+   	 	exclude group: "com.squareup.okio", module: "okio-jvm"
+    	exclude group: "com.squareup.okio", module: "okio"
+	}
+}
+```
+
+```
+android {
+compileSdk = 35
+// for Kotlin code
+defaultConfig {
+    // other code
+    minSdkVersion 24
+    targetSdkVersion 35
+    multiDexEnabled true
+	}
+}
+// After android block
+configurations.all {
+    exclude(group = "com.squareup.okio", module = "okio-jvm")
+    exclude(group = "com.squareup.okio", module = "okio")
 }
 ```
 
