@@ -1,7 +1,7 @@
 name: mobile_payment_plugin
 description: mobile payment sdk plugin
 version: 0.0.1
-homepage: https://github.com/mohammadz0606/mobile_payment_plugin
+homepage: https://github.com/MobilePaymentSDK/MobilePaymentSDK-Flutter
 
 environment:
   sdk: ^3.8.1
